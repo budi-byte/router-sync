@@ -20,21 +20,15 @@ fn get_api_key() -> String {
 }
 
 fn fetch_config(api_key: &str) -> Value {
-    let client = reqwest::blocking::Client::new();
-    match client
-        .get(API_URL)
-        .header("Authorization", format!("Bearer {}", api_key))
-        .header("User-Agent", "Mozilla/5.0")
-        .send()
+    match ureq::get(API_URL)
+        .set("Authorization", &format!("Bearer {}", api_key))
+        .set("User-Agent", "Mozilla/5.0")
+        .call()
     {
-        Ok(resp) if resp.status().is_success() => resp.json().unwrap_or_else(|e| {
+        Ok(resp) => resp.into_json().unwrap_or_else(|e| {
             eprintln!("JSON parse error: {}", e);
             process::exit(1);
         }),
-        Ok(resp) => {
-            eprintln!("HTTP error: {}", resp.status());
-            process::exit(1);
-        }
         Err(e) => {
             eprintln!("Request failed: {}", e);
             process::exit(1);
