@@ -105,10 +105,10 @@ fn get_api_key(arg_key: Option<String>) -> String {
             return k;
         }
     }
-    if let Ok(key) = env::var("KAIRUX_API_KEY") {
+    if let Ok(key) = env::var("ROUTER_BOCAH_API_KEY") {
         return key;
     }
-    match rpassword::prompt_password("Kairux API Key: ") {
+    match rpassword::prompt_password("Router-Bocah API Key: ") {
         Ok(k) if !k.is_empty() => k,
         _ => {
             eprintln!("Error: No API key provided");
@@ -314,7 +314,7 @@ fn sync_zed(remote_models: &serde_json::Map<String, Value>, zed_path: &PathBuf, 
     let old_arr = cfg
         .get("language_models")
         .and_then(|v| v.get("openai_compatible"))
-        .and_then(|v| v.get("kairux"))
+        .and_then(|v| v.get("router_bocah"))
         .and_then(|v| v.get("available_models"))
         .and_then(|v| v.as_array())
         .cloned()
@@ -389,7 +389,7 @@ fn sync_zed(remote_models: &serde_json::Map<String, Value>, zed_path: &PathBuf, 
     });
     println!("\nBackup saved: {}", bak_path.display());
 
-    cfg["language_models"]["openai_compatible"]["kairux"]["available_models"] = json!(new_models);
+    cfg["language_models"]["openai_compatible"]["router_bocah"]["available_models"] = json!(new_models);
     fs::write(
         zed_path,
         serde_json::to_string_pretty(&cfg).unwrap_or_else(|e| {
@@ -443,7 +443,7 @@ fn main() {
     let remote_cfg = fetch_config(&api_key, &baseurl);
     let remote_models = remote_cfg
         .get("provider")
-        .and_then(|p| p.get("Kairux"))
+        .and_then(|p| p.get("Router-Bocah"))
         .and_then(|k| k.get("models"))
         .and_then(|m| m.as_object())
         .map(|m| m.to_owned())
@@ -479,15 +479,15 @@ fn main() {
         process::exit(1);
     });
 
-    let kairux = cfg
+    let router_bocah = cfg
         .get("provider")
-        .and_then(|p| p.get("Kairux"))
+        .and_then(|p| p.get("Router-Bocah"))
         .unwrap_or_else(|| {
-            eprintln!("No 'Kairux' provider found in config");
+            eprintln!("No 'Router-Bocah' provider found in config");
             process::exit(1);
         });
 
-    let old_models = kairux
+    let old_models = router_bocah
         .get("models")
         .and_then(|m| m.as_object())
         .map(|m| m.to_owned())
@@ -546,8 +546,8 @@ fn main() {
     });
     println!("\nBackup saved: {}", bak_path.display());
 
-    cfg["provider"]["Kairux"]["models"] = json!(remote_models);
-    cfg["provider"]["Kairux"]["options"]["baseURL"] = json!(format!("{}/v1", baseurl));
+    cfg["provider"]["Router-Bocah"]["models"] = json!(remote_models);
+    cfg["provider"]["Router-Bocah"]["options"]["baseURL"] = json!(format!("{}/v1", baseurl));
     fs::write(
         &config_path,
         serde_json::to_string_pretty(&cfg).unwrap_or_else(|e| {
