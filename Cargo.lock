@@ -397,6 +397,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "router-sync"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "rpassword",
+ "serde_json",
+ "ureq",
+]
+
+[[package]]
 name = "rpassword"
 version = "7.5.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -545,16 +555,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "unicode-ident",
-]
-
-[[package]]
-name = "sync"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "rpassword",
- "serde_json",
- "ureq",
 ]
 
 [[package]]
