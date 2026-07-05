@@ -482,13 +482,20 @@ fn main() {
     let router_bocah = cfg
         .get("provider")
         .and_then(|p| p.get("Router-Bocah"))
-        .unwrap_or_else(|| {
-            eprintln!("No 'Router-Bocah' provider found in config");
-            process::exit(1);
-        });
+        .is_some();
 
-    let old_models = router_bocah
-        .get("models")
+    if !router_bocah {
+        println!("No 'Router-Bocah' provider found — creating entry...");
+        cfg["provider"]["Router-Bocah"]["npm"] = json!("@ai-sdk/openai-compatible");
+        cfg["provider"]["Router-Bocah"]["options"]["apiKey"] = json!(api_key);
+        cfg["provider"]["Router-Bocah"]["options"]["baseURL"] = json!(format!("{}/v1", baseurl));
+        cfg["provider"]["Router-Bocah"]["models"] = json!({});
+    }
+
+    let old_models = cfg
+        .get("provider")
+        .and_then(|p| p.get("Router-Bocah"))
+        .and_then(|k| k.get("models"))
         .and_then(|m| m.as_object())
         .map(|m| m.to_owned())
         .unwrap_or_else(serde_json::Map::new);
@@ -548,6 +555,7 @@ fn main() {
 
     cfg["provider"]["Router-Bocah"]["models"] = json!(remote_models);
     cfg["provider"]["Router-Bocah"]["options"]["baseURL"] = json!(format!("{}/v1", baseurl));
+    cfg["provider"]["Router-Bocah"]["options"]["apiKey"] = json!(api_key);
     fs::write(
         &config_path,
         serde_json::to_string_pretty(&cfg).unwrap_or_else(|e| {
