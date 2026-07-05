@@ -64,14 +64,12 @@ jobs:
         shell: pwsh
         run: |
           cd target/${{ matrix.target }}/release
-          Compress-Archive -Path router-sync.exe -DestinationPath ../../${{ matrix.artifact }}.zip
+          Compress-Archive -Path router-sync.exe -DestinationPath ../../../${{ matrix.artifact }}.zip
 
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          path: |
-            ${{ matrix.artifact }}.tar.gz
-            ${{ matrix.artifact }}.zip
+          path: ${{ matrix.artifact }}.*
 
   release:
     needs: build
